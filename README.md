@@ -1,5 +1,9 @@
 # ZSpace Tools 🛠️
 
+[![Build & Push Docker Image](https://github.com/king-joker-z/zspace-tools/actions/workflows/docker-build.yml/badge.svg)](https://github.com/king-joker-z/zspace-tools/actions/workflows/docker-build.yml)
+[![Docker Hub](https://img.shields.io/docker/v/xieyurong/zspace-tools?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/xieyurong/zspace-tools)
+[![Docker Pulls](https://img.shields.io/docker/pulls/xieyurong/zspace-tools)](https://hub.docker.com/r/xieyurong/zspace-tools)
+
 极空间 NAS 文件管理工具集。当前版本 (v0.1.0) 提供 **文件后缀批量转换 + 实时监听** 功能。
 
 ## ✨ 功能特性
@@ -10,6 +14,14 @@
 - 📋 **实时日志**：WebSocket 推送转换日志，操作可追溯
 - 💾 **配置持久化**：JSON 配置文件，映射到宿主机 volume
 - 📱 **响应式 UI**：Apple HIG 风格，手机平板电脑均可使用
+
+## 🐳 Docker 镜像
+
+镜像托管于 [Docker Hub](https://hub.docker.com/r/xieyurong/zspace-tools)，支持 **AMD64** 和 **ARM64** 架构。
+
+```bash
+docker pull xieyurong/zspace-tools:latest
+```
 
 ## 🚀 快速开始
 
@@ -112,6 +124,7 @@ docker build -t xieyurong/zspace-tools:latest .
 - **前端**: Vue 3 + Vite（go:embed 嵌入）
 - **容器**: Alpine Linux，镜像 < 20MB
 - **架构**: 支持 AMD64 + ARM64（极空间 NAS 兼容）
+- **CI/CD**: GitHub Actions 自动构建多架构镜像
 
 ## 📄 License
 

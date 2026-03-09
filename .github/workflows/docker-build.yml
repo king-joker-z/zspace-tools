@@ -1,0 +1,78 @@
+# =============================================================
+# Docker 多架构构建 & 推送到 Docker Hub
+# 触发条件：push 到 main 分支 / 创建 v* 标签
+# 镜像地址：xieyurong/zspace-tools
+# =============================================================
+name: Build & Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'        # 匹配 v0.1.0, v1.2.3 等语义化版本标签
+
+# 同一分支/标签只保留最新一次构建，取消旧的排队任务
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Docker Hub 镜像全名
+  IMAGE_NAME: xieyurong/zspace-tools
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      # ---- 1. 检出代码 ----
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # ---- 2. 设置 QEMU（跨架构模拟，arm64 需要） ----
+      - name: 设置 QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # ---- 3. 设置 Docker Buildx（多架构构建引擎） ----
+      - name: 设置 Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ---- 4. 登录 Docker Hub ----
+      - name: 登录 Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # ---- 5. 提取镜像标签元数据 ----
+      # push main → latest
+      # push tag v0.1.0 → v0.1.0 + latest
+      - name: 提取 Docker 标签元数据
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            # main 分支 → latest
+            type=raw,value=latest,enable={{is_default_branch}}
+            # git tag → 版本号（如 v0.1.0）
+            type=semver,pattern={{version}}
+            # git tag → 主次版本（如 v0.1）
+            type=semver,pattern={{major}}.{{minor}}
+
+      # ---- 6. 构建并推送多架构镜像 ----
+      - name: 构建并推送 Docker 镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64   # 支持 x86 和 ARM（极空间 NAS）
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # 利用 GitHub Actions 缓存加速构建
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
