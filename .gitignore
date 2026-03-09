@@ -1,0 +1,23 @@
+# 二进制
+zspace-tools
+*.exe
+
+# Go
+vendor/
+
+# Node
+web/node_modules/
+web/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 配置（运行时生成）
+config.json

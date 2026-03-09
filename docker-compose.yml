@@ -1,0 +1,13 @@
+version: '3'
+services:
+  zspace-tools:
+    image: xieyurong/zspace-tools:latest
+    container_name: zspace-tools
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config:/config        # 配置持久化
+      - /path/to/watch:/watch   # 监听目录（替换为你的实际路径）
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
